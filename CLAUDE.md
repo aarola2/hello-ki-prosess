@@ -10,7 +10,19 @@ Testprosjekt for å øve på en KI-assistert utviklingsprosess. Appen er én skj
 - Frontend og backend har hver sin `package.json`
 
 ## Kommandoer
-(Kjøres fra `frontend/` eller `backend/`. Opprettes når skjelettet er på plass.)
+
+### Backend
+(Kjøres fra `backend/`.)
+- `npm install`: installer avhengigheter
+- `npm run dev`: start utviklingsserver
+- `npm run build`: bygg
+- `npm start`: kjør den bygde serveren
+- `npm test`: kjør tester
+- `npm run lint`: kjør lint
+- `npm run typecheck`: typesjekk koden, også testene
+
+### Frontend
+(Kjøres fra `frontend/`. Opprettes når skjelettet er på plass.)
 - `npm install`: installer avhengigheter
 - `npm run dev`: start utviklingsserver
 - `npm run build`: bygg
