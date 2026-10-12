@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="nb">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Prototype: hilsen-siden</title>
+  </head>
+  <body>
+    <fieldset>
+      <legend>Prototype-kontroller (ikke en del av siden)</legend>
+      <button type="button" data-scenario="svarer">Backend svarer</button>
+      <button type="button" data-scenario="treg">Backend er treg</button>
+      <button type="button" data-scenario="feiler">Backend feiler</button>
+      <p>Tilstand: <output id="tilstand"></output></p>
+      <p>
+        Hvert scenario simulerer at siden åpnes på nytt. Forsinkelsene finnes bare i prototypen.
+        Ved avvik gjelder hilsen-side.md.
+      </p>
+    </fieldset>
+
+    <fieldset>
+      <legend>Siden</legend>
+      <p id="side"></p>
+    </fieldset>
+
+    <script>
+      const TEKSTER = {
+        laster: 'Laster …',
+        'hilsen vist': 'Hello World',
+        feilmelding: 'Kunne ikke hente hilsenen. Prøv igjen senere.',
+      };
+
+      const SCENARIOER = {
+        svarer: { ventetidMs: 500, sluttilstand: 'hilsen vist' },
+        treg: { ventetidMs: 3000, sluttilstand: 'hilsen vist' },
+        feiler: { ventetidMs: 500, sluttilstand: 'feilmelding' },
+      };
+
+      const side = document.getElementById('side');
+      const tilstandsvisning = document.getElementById('tilstand');
+      let ventendeSvar;
+
+      function visTilstand(tilstand) {
+        side.textContent = TEKSTER[tilstand];
+        tilstandsvisning.textContent = tilstand;
+      }
+
+      function startScenario(navn) {
+        const { ventetidMs, sluttilstand } = SCENARIOER[navn];
+        clearTimeout(ventendeSvar);
+        visTilstand('laster');
+        ventendeSvar = setTimeout(() => visTilstand(sluttilstand), ventetidMs);
+      }
+
+      for (const knapp of document.querySelectorAll('[data-scenario]')) {
+        knapp.addEventListener('click', () => startScenario(knapp.dataset.scenario));
+      }
+
+      startScenario('svarer');
+    </script>
+  </body>
+</html>
