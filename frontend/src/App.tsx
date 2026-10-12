@@ -2,6 +2,11 @@ import { useEffect, useState } from 'react';
 
 type HelloResponse = { message: string };
 
+type GreetingState =
+  | { status: 'loading' }
+  | { status: 'loaded'; greeting: string }
+  | { status: 'failed' };
+
 async function fetchGreeting(): Promise<string> {
   const response = await fetch('/api/hello');
   if (!response.ok) {
@@ -13,21 +18,24 @@ async function fetchGreeting(): Promise<string> {
 }
 
 function App() {
-  const [greeting, setGreeting] = useState<string | null>(null);
+  const [state, setState] = useState<GreetingState>({ status: 'loading' });
 
   useEffect(() => {
     fetchGreeting()
-      .then(setGreeting)
-      .catch(() => {
-        // Feilmeldingen til brukeren kommer i #11. Her holder det at appen ikke krasjer.
-      });
+      .then((greeting) => setState({ status: 'loaded', greeting }))
+      .catch(() => setState({ status: 'failed' }));
   }, []);
 
-  if (greeting === null) {
+  if (state.status === 'loading') {
+    return <p>Laster …</p>;
+  }
+
+  if (state.status === 'failed') {
+    // Feilmeldingen til brukeren kommer i #11. Inntil da vises ingenting.
     return null;
   }
 
-  return <p>{greeting}</p>;
+  return <p>{state.greeting}</p>;
 }
 
 export default App;
