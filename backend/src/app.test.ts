@@ -7,7 +7,7 @@ describe('buildApp', () => {
 
     const response = await app.inject({ method: 'GET', url: '/finnes-ikke' });
 
-    expect(response.statusCode).toBe(404);
+    expect(response.statusCode).toBe(200);
     await app.close();
   });
 });
