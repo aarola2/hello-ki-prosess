@@ -1,5 +1,9 @@
 import Fastify, { type FastifyInstance, type FastifyServerOptions } from 'fastify';
 
 export function buildApp(options: FastifyServerOptions = {}): FastifyInstance {
-  return Fastify(options);
+  const app = Fastify(options);
+
+  app.get('/api/hello', (_request, reply) => reply.send({ message: 'Hello World' }));
+
+  return app;
 }
