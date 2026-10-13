@@ -31,8 +31,7 @@ function App() {
   }
 
   if (state.status === 'failed') {
-    // Feilmeldingen til brukeren kommer i #11. Inntil da vises ingenting.
-    return null;
+    return <p>Kunne ikke hente hilsenen. Prøv igjen senere.</p>;
   }
 
   return <p>{state.greeting}</p>;
