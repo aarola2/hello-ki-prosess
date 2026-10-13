@@ -1,17 +1,11 @@
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import App from './App.tsx';
 
 const LOADING_TEXT = 'Laster …';
+const ERROR_TEXT = 'Kunne ikke hente hilsenen. Prøv igjen senere.';
 
 const fetchMock = vi.fn<typeof fetch>();
-
-// Lar løftekjeden etter fetch gjøre seg ferdig, slik at testen ser sluttilstanden.
-async function settle(): Promise<void> {
-  await act(async () => {
-    await new Promise((resolve) => setTimeout(resolve, 0));
-  });
-}
 
 describe('App', () => {
   beforeEach(() => {
@@ -41,24 +35,25 @@ describe('App', () => {
     expect(await screen.findByText('Hei fra testen')).toBeInTheDocument();
   });
 
-  it('viser ingenting og krasjer ikke når kallet feiler', async () => {
+  it('viser bare feilmeldingen ved nettverksfeil', async () => {
     fetchMock.mockRejectedValue(new TypeError('Failed to fetch'));
 
     const { container } = render(<App />);
-    await settle();
 
-    expect(container).toBeEmptyDOMElement();
+    expect(await screen.findByText(ERROR_TEXT)).toBeInTheDocument();
+    expect(screen.queryByText(LOADING_TEXT)).not.toBeInTheDocument();
+    expect(container.textContent).toBe(ERROR_TEXT);
   });
 
-  it('viser ikke svaret som hilsen når status er utenfor 2xx', async () => {
-    fetchMock.mockResolvedValue(
-      Response.json({ message: 'Route GET:/api/hello not found' }, { status: 404 }),
-    );
+  it.each([404, 500])('viser bare feilmeldingen når status er %i', async (status) => {
+    fetchMock.mockResolvedValue(Response.json({ message: 'Skal ikke vises' }, { status }));
 
     const { container } = render(<App />);
-    await settle();
 
-    expect(container).toBeEmptyDOMElement();
+    expect(await screen.findByText(ERROR_TEXT)).toBeInTheDocument();
+    expect(screen.queryByText('Skal ikke vises')).not.toBeInTheDocument();
+    expect(screen.queryByText(LOADING_TEXT)).not.toBeInTheDocument();
+    expect(container.textContent).toBe(ERROR_TEXT);
   });
 
   it('viser lasteteksten mens kallet er uavklart', () => {
